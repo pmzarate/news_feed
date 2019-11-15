@@ -1,60 +1,56 @@
 import React, { Component } from 'react'
-//import Typography from '@material-ui/core/Typography';
+import Typography from '@material-ui/core/Typography';
 
 class AuthorSearch extends Component {
 
-    constructor(props) {
-      super(props);
-        this.state = {
-          author: '',
-          results: [],
-     }
-   };
-   
-onChange = () => {
-      this.setState({ results: this.state.author
-      }, () => {
-        if (this.state.author && this.state.author.length > 1) {
-          if (this.state.author.length % 2 === 0) {
-            this.getArticle()
-          }
-        } else if (!this.state.author) {
-          return ("Results not found")
-        }
-      })
-    }
+      constructor(props) {
+        super(props);
+          this.state = {
+            author: '',
+            news: []
+      }
+    };
 
-getArticle = () => {
-      fetch ( `http://hn.algolia.com/api/v1/search_by_author?query= ${ author }`)
+  getArticle = () => {
+      fetch ( `http://hn.algolia.com/api/v1/search_by_author?query= ${ this.state.author }`)
       .then (res => res.json())
       // .then (res => console.log ("made it"))
-      .then( data  => {this.setState({
-          results: data.hits})
-      })
-      .catch (error => console.log("error", error))
-    }   
+      .then( data  => {console.log ("got it", data.hits);
+            if (data.hits.length !==0) {
+              this.setState({ news: data.hits});
+          } else {
+            this.setState({ news: [{title: 'No Results found'}] });
+          }});
+        };   
+
+    onChange = (e) => {
+      console.log ("made it here on click")
+      this.setState({ author: e.target.value});
+    }
 
 render() {
+  console.log (this.state)
   return (  
-     <div>
-        <h2>Search by Author</h2>
-        <form onSubmit = {this.onChange}>
-          <input type= "text"  
-           name="query"  
-           value={this.state.author}
-           onChange={this.onChange}/>
-       </form>
-       <ul>
-         {this.state.results.map((result,index) =>
-            <p className="m-t" key={index+1}>
-             <h4>{result.hits.author}</h4>
-             <span>{result.hits.url}</span>
-           </p>
-           )}
-       </ul>
+      <div className = "authorSearch">
+            <input ref= "Author"  onChange={this.onChange} type="search"
+            name="search-author"   id="search-author"
+            placeholder= "Search by Author..."
+            value={this.state.author}/>
+              <button onClick={this.click}>Search</button>
+            {this.state.news.map((news,index) => {
+              return (
+                <Typography>
+                <div key = {index}>
+                  <p className="Author"> {news.title} </p>
+            <a href = {news.url}> {news.url} </a>
+            </div>
+            </Typography>
+            );
+        })}
       </div>
     ) 
-}
+  }
 }
 
 export default AuthorSearch
+

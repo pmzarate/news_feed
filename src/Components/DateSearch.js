@@ -1,5 +1,5 @@
 import React, { Component } from 'react'
-//import Typography from '@material-ui/core/Typography';
+import Typography from '@material-ui/core/Typography';
 
 class DateSearch extends Component {
 
@@ -7,54 +7,51 @@ class DateSearch extends Component {
       super(props);
             this.state = {
               byDate: '',
-              results: [],
+              news: []
       };
     }
-     
-onChange = () => {
-      this.setState({ results: this.state.byDate
-      }, () => {
-        if (this.state.byDate && this.state.byDate.length > 1) {
-          if (this.state.byDate.length % 2 === 0) {
-            this.getArticle()
-          }
-        } else if (!this.state.byDate) {
-          return ("Results not found")
-        }
-      })
+  
+    
+    getArticle = () => {
+        fetch ( `http://hn.algolia.com/api/v1/search_by_date?query= ${this.state.byDate} `)
+        .then (res => res.json())
+        .then( data  => {console.log ("got it", data.hits);
+          if (data.hits.length !== 0) {
+              this.setState({news: data.hits});
+              } else {
+              this.setState({ news: [{title: 'No Results found'}] 
+              });
+            }}   
+        );
     }
 
-getArticle = () => {
-      fetch ( `http://hn.algolia.com/api/v1/search_by_date?query= ${byDate} `)
-      .then (res => res.json())
-      // .then (res => console.log ("made it"))
-      .then( data  => {this.setState({
-          results: data.hits})
-      })
-      .catch (error => console.log("error", error))
-    }   
-
+    onChange = (e) => {
+      console.log ("made it here on click")
+        this.setState({ byDate: e.target.value});
+    }
+    
 render() {
-  return (  
-     <div>
-        <h2>Search by Date</h2>
-        <form onSubmit = {this.onChange}>
-          <input type= "text"  
-           name="byDate"  
-           value={this.state.byDate}
-           onChange={this.onChange}/>
-       </form>
-       <ul>
-         {this.state.results.map((result,index) =>
-            <p className="m-t" key={index+1}>
-             <h4>{result.hits.byDate}</h4>
-             <span>{result.hits.url}</span>
-           </p>
-           )}
-       </ul>
+  console.log(this.state)
+    return (
+     <div className="byDateSearch">
+          <input ref= "byDate"  onChange={this.onChange} type="search"
+           name="search-byDate"   id="search-byDate"
+           placeholder= "Search By Date..."
+           value={this.state.byDate}/>
+        <button onClick={this.click}>Search</button>
+          {this.state.news.map((news,index) => {
+            return (
+              <Typography>
+              <div key = {index}>
+                <p className="Author">{news.title}</p>
+                <a href = {news.url}> { news.url} </a>
+              </div>
+              </Typography>
+              );
+          })}       
       </div>
     ) 
-}
+  }
 }
 
 export default DateSearch

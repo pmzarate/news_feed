@@ -7,54 +7,57 @@ class TermSearch extends Component {
           super(props);
           this.state = {
                 term : '',
-                results : [],
-            };
+                news : []
+              };
           }
 
-onChange = () => {
-      this.setState({ results: this.state.term
-      }, () => {
-        if (this.state.term && this.state.term.length > 1) {
-          if (this.state.term.length % 2 === 0) {
-            this.getArticle()
+ onChange = (e) => {
+         //g ("made it here on click")
+          e.preventDefault();
+          this.getArticle(this.state.term);
           }
-        } else if (!this.state.term) {
-          return ("Results not found")
-        }
-      })
-    }
 
-getArticle = () => {
-      fetch (`http://hn.algolia.com/api/v1/search?query= ${ term }`)
-      .then (res => res.json())
-      // .then (res => console.log ("made it"))
-      .then( data  => {this.setState({
-          results: data.hits})
-      })
-      .catch (error => console.log("error", error))
-    }   
+  getArticle = (value) => {
+          fetch (`http://hn.algolia.com/api/v1/search?query= ${value}`)
+          .then (res => res.json())
+          .then (data => {
+            // console.log (data)
+                if ( data.hits.length === 0 ) {
+                  this.setState({ news: [{title: 'No Results found'}]  });
+            } else {
+                 this.setState({ news: data.hits });
+            }})
+            .catch(error => alert(error.message)); 
+          };
 
+  
+    
 render() {
-  return (  
-     <div>
-        <h2>Search by Term</h2>
-        <form onSubmit = {this.onChange}>
-          <input type= "text"  
-           name="term"  
-           value={this.state.term}
-           onChange={this.onChange}/>
-       </form>
-       <ul>
-         {this.state.results.map((result,index) =>
-            <p className="m-t" key={index+1}>
-             <h4>{result.hits.title}</h4>
-             <span>{result.hits.url}</span>
-           </p>
-           )}
-       </ul>
+  console.log(this.state)
+    return (
+      <div className="termSearch">
+        <h2>News Feed</h2>
+            <input ref= "term"  onSubmit={this.onChange} type="term"
+            name="term"   id="search-term"
+            placeholder= "Search Term/Tag..."
+            value={this.state.term}/>
+        <button onClick={this.click}>Search</button>
+    <ul>
+          {this.state.news.map((news,index) => {
+            return (    
+          
+              <div key = {index}>
+                <p className="Author">{news.title}</p>
+                <a href = {news.url}> { news.url} </a>
+              </div>
+            
+              
+        )})
+            }
+    </ul>        
       </div>
     ) 
-}
+  }
 }
 
 export default TermSearch
