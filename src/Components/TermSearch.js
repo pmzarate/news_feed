@@ -7,57 +7,83 @@ class TermSearch extends Component {
           super(props);
           this.state = {
                 term : '',
-                news : []
+                news : [],
+                author: "",
               };
           }
 
- onChange = (e) => {
-         //g ("made it here on click")
-          e.preventDefault();
-          this.getArticle(this.state.term);
-          }
+  onChange = (e) => {
+         // ("made it here on click")
+          this.setState({ term: e.target.value });
+        }
+        authorInput = (e) => {
+          console.log("made it here on click");
+          this.setState({ author: e.target.value });
+        };
 
-  getArticle = (value) => {
-          fetch (`http://hn.algolia.com/api/v1/search?query= ${value}`)
+  getArticle = (e) => {
+    e.preventDefault();
+          fetch (`http://hn.algolia.com/api/v1/search?query= ${this.state.term}`)
           .then (res => res.json())
           .then (data => {
             // console.log (data)
                 if ( data.hits.length === 0 ) {
                   this.setState({ news: [{title: 'No Results found'}]  });
             } else {
-                 this.setState({ news: data.hits });
+                 this.setState({ term: '', news: data.hits });
             }})
-            .catch(error => alert(error.message)); 
+          }
+          //   .catch(error => alert(error.message)); 
+          // };
+          
+          
+  getAuthor = (e) => {
+    e.preventDefault();
+          fetch(
+              `http://hn.algolia.com/api/v1/search?tags=story,author_${this.state.author}`
+            )
+          .then(res => res.json())
+              // .then (res => console.log ("made it"))
+          .then(data => {
+                console.log(data.hits, 'author');
+                this.setState({ author: "", news: data.hits });
+              });
           };
+        
 
-  
-    
 render() {
   console.log(this.state)
     return (
       <div className="termSearch">
-        <h2>News Feed</h2>
-            <input ref= "term"  onSubmit={this.onChange} type="term"
-            name="term"   id="search-term"
-            placeholder= "Search Term/Tag..."
-            value={this.state.term}/>
-        <button onClick={this.click}>Search</button>
-    <ul>
-          {this.state.news.map((news,index) => {
-            return (    
-          
-              <div key = {index}>
-                <p className="Author">{news.title}</p>
-                <a href = {news.url}> { news.url} </a>
+        {/* <h2>News Feed</h2> */}
+          <form onSubmit ={this.getArticle}>
+            <input
+              placeholder="search by term/tag"
+              onChange={this.onChange}
+              value={this.state.term}
+              name="Search term"></input>
+                <button type="submit">submit</button>
+          </form>
+          <br/>
+        	<form onSubmit={this.getAuthor}>
+				   	<input
+					  	placeholder="search by Author"
+				  	  onChange={this.authorInput}
+					   	value={this.state.author}
+						  name="Search Author"
+			    		></input>
+				        	<button type="submit">submit</button>
+			    	</form>
+	            <div className="article-list">
+              {this.state.news.map((a, i) => {
+            return (
+              <div key={i} className="article">
+                {a.title} {a.author}
               </div>
-            
-              
-        )})
-            }
-    </ul>        
+            )})}
+          </div>
       </div>
-    ) 
+    );
   }
 }
-
 export default TermSearch

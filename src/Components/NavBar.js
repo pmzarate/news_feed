@@ -3,8 +3,8 @@ import AppBar from '@material-ui/core/AppBar';
 import Toolbar from '@material-ui/core/ToolBar';
 import Typography from '@material-ui/core/Typography';
 import TermSearch from './TermSearch'
-import DateSearch from './DateSearch'
-import AuthorSearch from './AuthorSearch'
+// import DateSearch from './DateSearch'
+//import AuthorSearch from './AuthorSearch';
 
 const NavBar = () => {
         return (
@@ -17,8 +17,8 @@ const NavBar = () => {
                     </Toolbar>
                 </AppBar>
                 <TermSearch/>
-                <AuthorSearch/>
-                <DateSearch/>
+                {/* <AuthorSearch/> */}
+                {/* <DateSearch/> */} 
             </div>
         )
     

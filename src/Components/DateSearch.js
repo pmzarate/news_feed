@@ -11,6 +11,11 @@ class DateSearch extends Component {
       };
     }
   
+    onChange = (e) => {
+      console.log ("made it here on click")
+        this.setState({ byDate: e.target.value});
+    }
+
     
     getArticle = () => {
         fetch ( `http://hn.algolia.com/api/v1/search_by_date?query= ${this.state.byDate} `)
@@ -25,10 +30,7 @@ class DateSearch extends Component {
         );
     }
 
-    onChange = (e) => {
-      console.log ("made it here on click")
-        this.setState({ byDate: e.target.value});
-    }
+   
     
 render() {
   console.log(this.state)
