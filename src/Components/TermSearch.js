@@ -63,11 +63,14 @@ class TermSearch extends Component {
   
   getByDate = (e) => {
     e.preventDefault();
+          // var myDate = new Date(e.target.value);
+          // var myEpoch = myDate.getTime()/1000.0;
+          // console.log(myEpoch);
+          //debugger;
           fetch(
-            `http://hn.algolia.com/api/v1/search_by_date?query`
-                    )
+            `http://hn.algolia.com/api/v1/search_by_date?numericFilters=created_at_ ${this.state.date}`)
           .then(res => res.json())
-              // .then (res => console.log ("made it"))
+          // .then (res => console.log ("made it"))
           .then(data => {
               // console.log(data.hits, 'date');
                 if (data.hits.length === 0) {
@@ -92,7 +95,7 @@ render() {
               onChange={this.onChange}
               value={this.state.term}
               name="Search term"></input>
-                <button type="submit">submit</button>
+                <button type="submit">Search</button>
           </form>
         <br/>
           <form onSubmit={this.getAuthor}>
@@ -102,25 +105,26 @@ render() {
 				     	value={this.state.author}
 					    name="Search Author"
 			   	  	></input>
-			        	<button type="submit">submit</button>
+			        	<button type="submit">Search</button>
 			   	</form>
         <br/>
-          <form onSubmit={this.getByDate}>
+           <form onSubmit={this.getByDate}> 
 			 	   	<input
-					   	placeholder="search by Most Recent Articles"
+					   	placeholder="search by Date"
 				      onChange={this.dateInput}
 				     	value={this.state.date}
 					    name="Search By Date"
 			   	  	></input>
-			        	<button type="submit">submit</button>
-			   	</form> 
+			        	<button type="submit">Search</button>
+			     </form> 
 	          <div className="article-list">
               {this.state.news.map((a, i) => {
             return (
                 <div key={i} className="article">
-                    <h3> {a.title} </h3>
-                    <h5> {a.author}</h5>
-                    <a href={a.url} className='url path'/>
+                   <p><h3> {a.title} </h3>
+                    <h5> by: {a.author}</h5></p> 
+                    <h6><a href={a.url}></a></h6>
+                    <p> Published: {a.created_at}</p>
                   <br/>
                 </div>
             )})}
